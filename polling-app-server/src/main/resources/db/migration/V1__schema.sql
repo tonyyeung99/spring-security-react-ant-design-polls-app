@@ -67,3 +67,4 @@ CREATE TABLE `votes` (
   CONSTRAINT `fk_votes_poll_id` FOREIGN KEY (`poll_id`) REFERENCES `polls` (`id`),
   CONSTRAINT `fk_votes_choice_id` FOREIGN KEY (`choice_id`) REFERENCES `choices` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

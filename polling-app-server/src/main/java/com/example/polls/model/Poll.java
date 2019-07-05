@@ -1,16 +1,28 @@
 package com.example.polls.model;
 
-import com.example.polls.model.audit.UserDateAudit;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import com.example.polls.model.audit.UserDateAudit;
 
 /**
  * Created by rajeevkumarsingh on 20/11/17.
@@ -37,6 +49,11 @@ public class Poll extends UserDateAudit {
     @BatchSize(size = 30)
     private List<Choice> choices = new ArrayList<>();
 
+//    @ManyToMany(mappedBy = "containPolls")
+//    private Set<Survey> contains;
+    @ManyToMany(mappedBy = "containPolls")
+    private List<Survey> surveys = new ArrayList<>();
+    
     @NotNull
     private Instant expirationDateTime;
 
@@ -81,4 +98,20 @@ public class Poll extends UserDateAudit {
         choices.remove(choice);
         choice.setPoll(null);
     }
+
+	public List<Survey> getSurveys() {
+		return surveys;
+	}
+
+	public void setSurveys(List<Survey> surveys) {
+		this.surveys = surveys;
+	}
+
+	@Override
+	public String toString() {
+		return "Poll [id=" + id + ", question=" + question + ", choices=" + choices + ", surveys=" + surveys
+				+ ", expirationDateTime=" + expirationDateTime + ", createdBy=" + getCreatedBy() + "]";
+	}
+    
+    
 }

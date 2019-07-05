@@ -3,6 +3,7 @@ package com.example.polls.controller;
 import com.example.polls.model.*;
 import com.example.polls.payload.*;
 import com.example.polls.repository.PollRepository;
+import com.example.polls.repository.SurveyRepository;
 import com.example.polls.repository.UserRepository;
 import com.example.polls.repository.VoteRepository;
 import com.example.polls.security.CurrentUser;
@@ -29,7 +30,12 @@ public class PollController {
 
     @Autowired
     private PollRepository pollRepository;
-
+    
+    //*** New Code ***
+    @Autowired
+    private SurveyRepository surveyRepository;
+    //*** End of New Code ***
+    
     @Autowired
     private VoteRepository voteRepository;
 
@@ -60,6 +66,22 @@ public class PollController {
         return ResponseEntity.created(location)
                 .body(new ApiResponse(true, "Poll Created Successfully"));
     }
+    
+    //***New Code***
+    @PostMapping("/survey")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> createSurvey(@Valid @RequestBody SurveyRequest surveyRequest) {
+        Survey poll = pollService.createSurvey(surveyRequest);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().path("/{pollId}")
+                .buildAndExpand(poll.getId()).toUri();
+
+        return ResponseEntity.created(location)
+                .body(new ApiResponse(true, "Survey Created Successfully"));
+    }   
+
+    //***End of new code***
 
 
     @GetMapping("/{pollId}")

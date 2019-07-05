@@ -6,8 +6,10 @@ import com.example.polls.model.*;
 import com.example.polls.payload.PagedResponse;
 import com.example.polls.payload.PollRequest;
 import com.example.polls.payload.PollResponse;
+import com.example.polls.payload.SurveyRequest;
 import com.example.polls.payload.VoteRequest;
 import com.example.polls.repository.PollRepository;
+import com.example.polls.repository.SurveyRepository;
 import com.example.polls.repository.UserRepository;
 import com.example.polls.repository.VoteRepository;
 import com.example.polls.security.UserPrincipal;
@@ -36,6 +38,9 @@ public class PollService {
 
     @Autowired
     private PollRepository pollRepository;
+    
+    @Autowired
+    private SurveyRepository surveyRepository;
 
     @Autowired
     private VoteRepository voteRepository;
@@ -159,7 +164,37 @@ public class PollService {
 
         return pollRepository.save(poll);
     }
+    
+    //*** new code ***
+    public Survey createSurvey(SurveyRequest surveyRequest) {
+    	Survey survey = new Survey();
+    	surveyRequest.getPolls().forEach(pollRequest-> {Poll poll = populatePoll(pollRequest);
+			survey.addContainPolls(poll);
+    	});
+        Instant now = Instant.now();
+        Instant expirationDateTime = now.plus(Duration.ofDays(surveyRequest.getSurveyLength().getDays()))
+                .plus(Duration.ofHours(surveyRequest.getSurveyLength().getHours()));
+        survey.setExpirationDateTime(expirationDateTime);
+        surveyRepository.save(survey);
+    	return survey;
+    }
+    
+    private Poll populatePoll(PollRequest pollRequest) {
+        Poll poll = new Poll();
+        poll.setQuestion(pollRequest.getQuestion());
 
+        pollRequest.getChoices().forEach(choiceRequest -> {
+            poll.addChoice(new Choice(choiceRequest.getText()));
+        });
+
+        Instant now = Instant.now();
+        Instant expirationDateTime = now.plus(Duration.ofDays(pollRequest.getPollLength().getDays()))
+                .plus(Duration.ofHours(pollRequest.getPollLength().getHours()));
+
+        poll.setExpirationDateTime(expirationDateTime);
+        return poll;
+    }
+    //*** end new code ***
     public PollResponse getPollById(Long pollId, UserPrincipal currentUser) {
         Poll poll = pollRepository.findById(pollId).orElseThrow(
                 () -> new ResourceNotFoundException("Poll", "id", pollId));
