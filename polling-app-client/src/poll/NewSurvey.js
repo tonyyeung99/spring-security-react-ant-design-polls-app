@@ -6,7 +6,16 @@ import {
   POLL_CHOICE_MAX_LENGTH
 } from "../constants";
 import "./NewPoll.css";
-import { Form, Input, Button, Icon, Select, Col, notification } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Icon,
+  Select,
+  Col,
+  notification,
+  Card
+} from "antd";
 import { tuple } from "antd/lib/_util/type";
 const Option = Select.Option;
 const FormItem = Form.Item;
