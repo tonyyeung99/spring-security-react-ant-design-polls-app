@@ -38,19 +38,6 @@ class NewSurvey extends Component {
               text: ""
             }
           ]
-        },
-        {
-          question: {
-            text: ""
-          },
-          choices: [
-            {
-              text: ""
-            },
-            {
-              text: ""
-            }
-          ]
         }
       ],
       pollLength: {
@@ -61,12 +48,42 @@ class NewSurvey extends Component {
 
     this.addChoice = this.addChoice.bind(this);
     this.removeChoice = this.removeChoice.bind(this);
+    this.addPoll = this.addPoll.bind(this);
+    this.removePoll = this.removePoll.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleQuestionChange = this.handleQuestionChange.bind(this);
     this.handleChoiceChange = this.handleChoiceChange.bind(this);
     this.handlePollDaysChange = this.handlePollDaysChange.bind(this);
     this.handlePollHoursChange = this.handlePollHoursChange.bind(this);
     this.isFormInvalid = this.isFormInvalid.bind(this);
+  }
+
+  addPoll(event) {
+    const newPoll = {
+      question: {
+        text: ""
+      },
+      choices: [
+        {
+          text: ""
+        },
+        {
+          text: ""
+        }
+      ]
+    };
+    this.setState({
+      polls: this.state.polls.concat(newPoll)
+    });
+  }
+
+  removePoll(pollNumber) {
+    this.setState({
+      polls: [
+        ...this.state.polls.slice(0, pollNumber),
+        ...this.state.polls.slice(pollNumber + 1)
+      ]
+    });
   }
 
   addChoice(event, pollNumber) {
@@ -78,8 +95,8 @@ class NewSurvey extends Component {
               text: ""
             }
           ]);
-          return poll;
-        } else return poll;
+        }
+        return poll;
       })
     });
   }
@@ -249,6 +266,7 @@ class NewSurvey extends Component {
           pollNumber={index}
           addChoice={this.addChoice}
           removeChoice={this.removeChoice}
+          removePoll={this.removePoll}
           handleChoiceChange={this.handleChoiceChange}
           handleQuestionChange={this.handleQuestionChange}
         />
@@ -260,6 +278,11 @@ class NewSurvey extends Component {
         <div className="new-poll-content">
           <Form onSubmit={this.handleSubmit} className="create-poll-form">
             {pollViews}
+            <FormItem className="poll-form-row">
+              <Button type="dashed" onClick={event => this.addPoll(event)}>
+                <Icon type="plus" /> Add a Poll
+              </Button>
+            </FormItem>
             <FormItem className="poll-form-row">
               <Col xs={24} sm={4}>
                 Poll length:
@@ -331,33 +354,46 @@ function PollItem(props) {
   });
 
   return (
-    <div>
-      <FormItem
-        validateStatus={props.poll.question.validateStatus}
-        help={props.poll.question.errorMsg}
-        className="poll-form-row"
+    <div style={{ background: "#ECECEC", padding: "30px" }}>
+      <Card
+        title={"Poll No. " + (props.pollNumber + 1)}
+        extra={
+          props.pollNumber > 0 ? (
+            <Icon
+              type="close-circle"
+              theme="filled"
+              onClick={() => props.removePoll(props.pollNumber)}
+            />
+          ) : null
+        }
       >
-        <TextArea
-          placeholder="Enter your question"
-          style={{ fontSize: "16px" }}
-          autosize={{ minRows: 3, maxRows: 6 }}
-          name="question"
-          value={props.poll.question.text}
-          onChange={event =>
-            props.handleQuestionChange(event, props.pollNumber)
-          }
-        />
-      </FormItem>
-      {choiceViews}
-      <FormItem className="poll-form-row">
-        <Button
-          type="dashed"
-          onClick={event => props.addChoice(event, props.pollNumber)}
-          disabled={props.poll.choices.length === MAX_CHOICES}
+        <FormItem
+          validateStatus={props.poll.question.validateStatus}
+          help={props.poll.question.errorMsg}
+          className="poll-form-row"
         >
-          <Icon type="plus" /> Add a choice
-        </Button>
-      </FormItem>
+          <TextArea
+            placeholder="Enter your question"
+            style={{ fontSize: "16px" }}
+            autosize={{ minRows: 3, maxRows: 6 }}
+            name="question"
+            value={props.poll.question.text}
+            onChange={event =>
+              props.handleQuestionChange(event, props.pollNumber)
+            }
+          />
+        </FormItem>
+        {choiceViews}
+        <FormItem className="poll-form-row">
+          <Button
+            type="dashed"
+            onClick={event => props.addChoice(event, props.pollNumber)}
+            disabled={props.poll.choices.length === MAX_CHOICES}
+          >
+            <Icon type="plus" /> Add a choice
+          </Button>
+        </FormItem>
+      </Card>
     </div>
   );
 }
