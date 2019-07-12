@@ -42,6 +42,55 @@ export function createPoll(pollData) {
     body: JSON.stringify(pollData)
   });
 }
+
+export function getAllSurveys(page, size) {
+  console.log("getAllSurveys Test 1");
+
+  page = page || 0;
+  size = size || POLL_LIST_SIZE;
+
+  const json = {
+    content: [
+      {
+        id: 17,
+        numQuestion: 2,
+        createdBy: { id: 3, username: "user_b", name: "user b" },
+        creationDateTime: "2019-07-09T05:01:05Z",
+        expirationDateTime: "2019-07-10T05:01:05Z",
+        totalVotes: 0,
+        expired: true
+      },
+      {
+        id: 18,
+        numQuestion: 3,
+        createdBy: { id: 3, username: "user_b", name: "user b" },
+        creationDateTime: "2019-07-09T05:01:05Z",
+        expirationDateTime: "2019-07-10T05:01:05Z",
+        totalVotes: 0,
+        expired: true
+      },
+      {
+        id: 13,
+        numQuestion: 4,
+        createdBy: { id: 3, username: "user_b", name: "user b" },
+        creationDateTime: "2019-07-04T09:15:59Z",
+        expirationDateTime: "2019-07-07T12:15:59Z",
+        totalVotes: 0,
+        expired: true
+      }
+    ],
+    page: 0,
+    size: 30,
+    totalElements: 18,
+    totalPages: 1,
+    last: true
+  };
+
+  let promise = new Promise(function(resolve, reject) {
+    resolve(json);
+  });
+  return promise;
+}
 export function createSurvey(surveyData) {
   return request({
     url: API_BASE_URL + "/polls/survey",

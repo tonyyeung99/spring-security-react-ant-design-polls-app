@@ -6,6 +6,7 @@ import { getCurrentUser } from "../util/APIUtils";
 import { ACCESS_TOKEN } from "../constants";
 
 import PollList from "../poll/PollList";
+import SurveyList from "../poll/SurveyList";
 import NewPoll from "../poll/NewPoll";
 import NewSurvey from "../poll/NewSurvey";
 import Login from "../user/login/Login";
@@ -110,6 +111,18 @@ class App extends Component {
                 path="/"
                 render={props => (
                   <PollList
+                    isAuthenticated={this.state.isAuthenticated}
+                    currentUser={this.state.currentUser}
+                    handleLogout={this.handleLogout}
+                    {...props}
+                  />
+                )}
+              />
+              <Route
+                exact
+                path="/surveys"
+                render={props => (
+                  <SurveyList
                     isAuthenticated={this.state.isAuthenticated}
                     currentUser={this.state.currentUser}
                     handleLogout={this.handleLogout}
