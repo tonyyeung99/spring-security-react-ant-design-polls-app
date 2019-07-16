@@ -44,8 +44,8 @@ public class PollsJPATests {
     @Autowired
     private SurveyRepository surveyRepository;
     
-    @Autowired
-    private PollService pollService;
+    //@Autowired
+    //private PollService pollService;
     
 	@Test
 	public void contextLoads() {

@@ -53,6 +53,16 @@ public class PollController {
                                                 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
         return pollService.getAllPolls(currentUser, page, size);
     }
+    
+    //***New Code***
+    @GetMapping("/surveys")
+    public PagedResponse<SurveyResponse> getSurvey(@CurrentUser UserPrincipal currentUser,
+                                                @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+                                                @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
+        return pollService.getAllSurveys(currentUser, page, size);
+    }
+    //***End of New Code**
+    
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")

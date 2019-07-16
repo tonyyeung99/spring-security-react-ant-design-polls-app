@@ -7,6 +7,7 @@ import com.example.polls.payload.PagedResponse;
 import com.example.polls.payload.PollRequest;
 import com.example.polls.payload.PollResponse;
 import com.example.polls.payload.SurveyRequest;
+import com.example.polls.payload.SurveyResponse;
 import com.example.polls.payload.VoteRequest;
 import com.example.polls.repository.PollRepository;
 import com.example.polls.repository.SurveyRepository;
@@ -165,6 +166,30 @@ public class PollService {
         return pollRepository.save(poll);
     }
     
+    public PagedResponse<SurveyResponse> getAllSurveys(UserPrincipal currentUser, int page, int size) {
+        validatePageNumberAndSize(page, size);
+
+        // Retrieve Surveys
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
+        Page<Survey> surveys = surveyRepository.findAll(pageable);
+
+        if(surveys.getNumberOfElements() == 0) {
+            return new PagedResponse<>(Collections.emptyList(), surveys.getNumber(),
+            		surveys.getSize(), surveys.getTotalElements(), surveys.getTotalPages(), surveys.isLast());
+        }
+
+        // Map Survey to SurveyResponses containing survey creator details
+        List<Long> pollIds = surveys.map(Survey::getId).getContent();
+        Map<Long, User> creatorMap = getSurveyCreatorMap(surveys.getContent());
+
+        List<SurveyResponse> surveyResponses = surveys.map(survey -> {
+            return ModelMapper.mapSurveyToSurveyResponse(survey,
+                    creatorMap.get(survey.getCreatedBy()));
+        }).getContent();
+
+        return new PagedResponse<>(surveyResponses, surveys.getNumber(),
+        		surveys.getSize(), surveys.getTotalElements(), surveys.getTotalPages(), surveys.isLast());
+    }
     //*** new code ***
     public Survey createSurvey(SurveyRequest surveyRequest) {
     	Survey survey = new Survey();
@@ -307,4 +332,21 @@ public class PollService {
 
         return creatorMap;
     }
+    
+    //*** New Code
+    Map<Long, User> getSurveyCreatorMap(List<Survey> surveys) {
+        // Get Survey Creator details of the given list of surveys
+        List<Long> creatorIds = surveys.stream()
+                .map(Survey::getCreatedBy)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<User> creators = userRepository.findByIdIn(creatorIds);
+        Map<Long, User> creatorMap = creators.stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+
+        return creatorMap;
+    }
+    
+    //*** End of New Code ***
 }
